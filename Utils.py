@@ -2,7 +2,8 @@ import numpy as np
 
 
 def load_file(filename):
-    return np.loadtxt(filename).astype(int)
+    return np.loadtxt(filename)
+
 
 
 def shuffle_data(x_data, y_data):
@@ -23,6 +24,6 @@ def split(x_data, y_data):
 
 
 def normalize(array):
-    for i in range(array.shape[1]):  # normalize - Z-Score
-        array[:, i] = (array[:, i] - np.mean(array[:, i])) / np.std(array[:, i])
-    return array
+    norm = 255.0**2
+    a = array/norm
+    return a.copy()
