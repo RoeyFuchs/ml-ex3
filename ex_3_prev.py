@@ -2,6 +2,9 @@ from Utils import *
 import sys
 from scipy.special import softmax
 
+
+import datetime
+
 # np.seterr(all='raise')
 
 sigmoid = lambda x: 1 / (1 + np.exp(-x))
@@ -15,31 +18,29 @@ def relu(x):
 
 
 def loss_func(x, y):
-    epsilon = 1e-10
+    epsilon = 1e-6
     return -np.log(x[int(y)] + epsilon)
 
 
 def initilize(start_shape):
-    num_of_nurons_1 = 250
-    num_of_nurons_2 = 100
+    num_of_nurons_1 = 100
+    num_of_nurons_2 = 10
+
+
     num_of_labels = 10
-    uniform_range = 3
+    uniform_range = 0.1
     w1 = np.random.uniform(-uniform_range, uniform_range, ([start_shape, num_of_nurons_1]))
     w2 = np.random.uniform(-uniform_range, uniform_range, ([num_of_nurons_1, num_of_nurons_2]))
     w3 = np.random.uniform(-uniform_range, uniform_range, ([num_of_nurons_2, num_of_labels]))
 
-    # b1 = np.zeros([1, num_of_nurons_1])
-    # b2 = np.zeros([1, num_of_nurons_2])
-    # b3 = np.zeros([1, num_of_labels])
-
-    b1 = np.random.uniform(-1, 1, ([1, num_of_nurons_1]))
-    b2 = np.random.uniform(-1, 1, ([1, num_of_nurons_2]))
-    b3 = np.random.uniform(-1, 1, ([1, num_of_labels]))
+    b1 = np.random.uniform(-uniform_range, uniform_range, ([1, num_of_nurons_1]))
+    b2 = np.random.uniform(-uniform_range, uniform_range, ([1, num_of_nurons_2]))
+    b3 = np.random.uniform(-uniform_range, uniform_range, ([1, num_of_labels]))
 
     return {'w1': w1.copy(), 'w2': w2.copy(), 'w3': w3.copy(), 'b1': b1.copy(), 'b2': b2.copy(), 'b3': b3.copy()}
 
 
-def train(x_data, y_data, ephocs=40):
+def train(x_data, y_data, ephocs=100):
     x_data, y_data, x_valid, y_valid = split(x_data, y_data)
 
     init = initilize(x_data.shape[1])
@@ -57,19 +58,18 @@ def train(x_data, y_data, ephocs=40):
         print(_)
         x_data, y_data = shuffle_data(x_data, y_data)
         for x, y in zip(x_data, y_data):
+
             params = {'w1': w1, 'w2': w2, 'w3': w3, 'b1': b1, 'b2': b2, 'b3': b3}
             fprop_vals = fprop(x, y, params)
-
             if (fprop_vals['loss'] > 0):
                 bprop_vals = bprop(fprop_vals)
 
                 #  update
-                # learning_rate = 0.001
-                learning_rate = 1 / 255
+                learning_rate = 0.001
                 w1 -= learning_rate * bprop_vals['w1']
                 w2 -= learning_rate * bprop_vals['w2']
                 w3 -= learning_rate * bprop_vals['w3']
-                learning_rate = 0.001
+
                 b1 -= learning_rate * bprop_vals['b1']
                 b2 -= learning_rate * bprop_vals['b2']
                 b3 -= learning_rate * bprop_vals['b3']
@@ -151,11 +151,12 @@ def predicte(x_test, best_values):
 
 
 def main():
+    print(datetime.datetime.now())
     x = normalize(load_file(sys.argv[1]))
     y = load_file(sys.argv[2])
     best_values = train(x, y)
     x_test = normalize(load_file(sys.argv[3]))
-    predicte(x_test, best_values)
+    # predicte(x_test, best_values)
 
 
 if __name__ == "__main__":

@@ -3,6 +3,7 @@ import numpy as np
 
 def load_file(filename):
     return np.loadtxt(filename)
+    # return np.loadtxt(filename, max_rows=5000)
 
 
 
@@ -24,6 +25,6 @@ def split(x_data, y_data):
 
 
 def normalize(array):
-    norm = 255.0**2
+    norm = 255.0
     a = array/norm
     return a.copy()
